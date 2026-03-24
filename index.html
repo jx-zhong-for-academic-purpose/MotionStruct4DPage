@@ -1,0 +1,464 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MotionStruct4D</title>
+    
+    <meta name="description" content="MotionStruct4D: Discovering Motion Structure of Gaussian Splatting for Video-to-4D Generation">
+    <meta name="keywords" content="video-to-4d, gaussian splatting, motion structure, novel view synthesis, 3d generation">
+    <meta property="og:title" content="MotionStruct4D: Discovering Motion Structure of Gaussian Splatting for Video-to-4D Generation">
+    <meta property="og:description" content="Official project page for MotionStruct4D">
+    
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            background: #f5f5f5;
+        }
+        
+        .container {
+            max-width: 1100px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+        
+        header {
+            background: linear-gradient(135deg, #2b5876 0%, #4e4376 100%);
+            color: white;
+            padding: 50px 0 40px;
+            text-align: center;
+        }
+        
+        h1 {
+            font-size: 2.2em;
+            margin-bottom: 25px;
+            font-weight: 700;
+            line-height: 1.3;
+        }
+        
+        .authors {
+            font-size: 1.2em;
+            margin-bottom: 15px;
+            line-height: 1.8;
+        }
+        
+        .authors a {
+            color: white;
+            text-decoration: none;
+            border-bottom: 1px dashed rgba(255,255,255,0.6);
+            display: inline-block;
+            margin: 0 10px;
+            transition: all 0.3s ease;
+        }
+        
+        .authors a:hover {
+            color: #f0f4f8;
+            border-bottom: 1px solid white;
+        }
+        
+        .affiliation {
+            font-size: 1.05em;
+            opacity: 0.95;
+            margin-bottom: 25px;
+        }
+        
+        .conference-tag {
+            display: inline-block;
+            background: rgba(255,255,255,0.25);
+            padding: 8px 20px;
+            border-radius: 20px;
+            font-size: 1.1em;
+            font-weight: 600;
+            margin-bottom: 30px;
+            backdrop-filter: blur(10px);
+        }
+        
+        section {
+            background: white;
+            margin: 30px 0;
+            padding: 40px;
+            border-radius: 8px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        }
+        
+        h2 {
+            color: #2b5876;
+            margin-bottom: 20px;
+            font-size: 1.8em;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #2b5876;
+        }
+        
+        p {
+            margin-bottom: 15px;
+            text-align: justify;
+        }
+        
+        .figure {
+            text-align: center;
+            margin: 30px 0;
+        }
+        
+        .figure img, .video-container video {
+            max-width: 100%;
+            height: auto;
+            border-radius: 6px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+        
+        /* Updated 4-Column Video Grid Styling */
+        .video-grid-4 {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 15px;
+            margin: 20px 0 40px 0;
+        }
+        
+        .video-grid-4 video {
+            width: 100%;
+            border-radius: 6px;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+            background: #f8f8f8;
+            transition: transform 0.2s ease;
+        }
+
+        .video-grid-4 video:hover {
+            transform: scale(1.03);
+        }
+
+        .video-item {
+            text-align: center;
+        }
+        
+        .figure-caption {
+            margin-top: 8px;
+            font-style: italic;
+            color: #666;
+            font-size: 0.85em;
+        }
+
+        .subject-title {
+            text-align: center; 
+            margin-top: 45px; 
+            color: #4e4376; 
+            font-size: 1.4em;
+            font-weight: 600;
+            border-bottom: 1px dashed #ddd;
+            padding-bottom: 10px;
+        }
+        
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin: 30px 0;
+        }
+        
+        .stat-box {
+            background: linear-gradient(135deg, #2b5876 0%, #4e4376 100%);
+            color: white;
+            padding: 25px;
+            border-radius: 8px;
+            text-align: center;
+        }
+        
+        .stat-number {
+            font-size: 2.5em;
+            font-weight: 700;
+            margin-bottom: 8px;
+        }
+        
+        .stat-label {
+            font-size: 1em;
+            opacity: 0.95;
+        }
+        
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+        }
+        
+        th, td {
+            padding: 12px;
+            text-align: center;
+            border-bottom: 1px solid #ddd;
+        }
+        
+        th {
+            background: #2b5876;
+            color: white;
+            font-weight: 600;
+        }
+        
+        tr:hover {
+            background: #f5f5f5;
+        }
+        
+        .bibtex {
+            background: #f8f8f8;
+            border-left: 4px solid #2b5876;
+            padding: 20px;
+            border-radius: 4px;
+            overflow-x: auto;
+            font-family: 'Courier New', monospace;
+            font-size: 0.9em;
+            margin: 20px 0;
+        }
+        
+        .bibtex pre {
+            margin: 0;
+            white-space: pre-wrap;
+        }
+        
+        footer {
+            text-align: center;
+            padding: 30px 0;
+            color: #666;
+            font-size: 0.95em;
+        }
+        
+        .highlight-box {
+            background: #f0f4f8;
+            border-left: 4px solid #2b5876;
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 4px;
+        }
+        
+        .highlight-box strong {
+            color: #2b5876;
+        }
+
+        @media (max-width: 900px) {
+            .video-grid-4 {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        @media (max-width: 600px) {
+            h1 { font-size: 1.6em; }
+            .authors { font-size: 1em; }
+            section { padding: 25px 20px; }
+            .video-grid-4 { grid-template-columns: repeat(2, 1fr); }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="container">
+            <h1>MotionStruct4D: Discovering Motion Structure of<br>Gaussian Splatting for Video-to-4D Generation</h1>
+            
+            <div class="authors">
+                <a href="#">Jia-Xing Zhong</a>
+                <a href="#">Kai Lu</a>
+                <a href="#">Jiaojiao Ye</a>
+                <a href="#">Niki Trigoni</a>
+                <a href="#">Andrew Markham</a>
+            </div>
+            
+            <div class="affiliation">
+                University of Oxford 
+            </div>
+            
+            <div class="conference-tag">
+                Under review
+            </div>
+        </div>
+    </header>
+
+    <div class="container">
+        <section>
+            <div class="figure">
+                <img src="assets/images/teaser.png" alt="MotionStruct4D Teaser">
+                <p class="figure-caption">
+                    Given a single-view monocular video, MotionStruct4D decomposes motion into rigid and non-rigid transformations, yielding high-quality 4D generation results viewable across arbitrary viewpoints and timestamps.
+                </p>
+            </div>
+        </section>
+
+        <section>
+            <h2>Abstract</h2>
+            <p>
+                Monocular Video-to-4D generation faces the fundamental challenge of inferring plausible 3D geometry and motion from limited single-view inputs. We present MotionStruct4D, a novel approach that discovers and exploits the underlying motion structure of 3D Gaussian Splatting for high-quality video-to-4D generation.
+            </p>
+            <p>
+                Our key insight is that real-world motion can be effectively decomposed into coarse rigid transformations that capture principal movements, complemented by detailed non-rigid deformations that account for fine-grained details. MotionStruct4D introduces:
+            </p>
+            <div class="highlight-box">
+                <strong>(1) Self-supervised Motion Structure Discovery</strong> - Identifies quasi-rigid parts by preserving spatiotemporal relationships without explicit 3D supervision.<br>
+                <strong>(2) Weighted Dense-to-Sparse Optimization</strong> - Transitions from dense per-Gaussian deformation to sparse control points, integrating rigid and non-rigid components through adaptive weighted fusion.<br>
+                <strong>(3) Comprehensive Benchmark Dataset</strong> - Curated to feature substantial object displacement and diverse articulated motion patterns for rigorous evaluation.
+            </div>
+        </section>
+
+        <section>
+            <h2>Method Overview</h2>
+            <div class="figure">
+                <img src="assets/images/method.png" alt="Method Architecture">
+                <p class="figure-caption">
+                    Our pipeline first identifies nearly rigid-body parts in a self-supervised way. We then decompose motion into rigid and non-rigid transformations and optimize the representation in a weighted dense-to-sparse manner.
+                </p>
+            </div>
+        </section>
+
+        <section>
+            <h2>4D Generation Results</h2>
+            <p>
+                MotionStruct4D successfully disentangles global rigid movements and local non-rigid deformations, ensuring both high rendering fidelity and consistent multi-view motion. Below we demonstrate the rendered novel views and their corresponding quasi-rigid part segmentations across multiple angles.
+            </p>
+
+            <div class="subject-title">Aurorus</div>
+            <div class="video-grid-4">
+                <div class="video-item"><video playsinline autoplay loop muted><source src="assets/videos/aurorus_15.mp4" type="video/mp4"></video><p class="figure-caption">Render (15°)</p></div>
+                <div class="video-item"><video playsinline autoplay loop muted><source src="assets/videos/aurorus_-75.mp4" type="video/mp4"></video><p class="figure-caption">Render (-75°)</p></div>
+                <div class="video-item"><video playsinline autoplay loop muted><source src="assets/videos/aurorus_105.mp4" type="video/mp4"></video><p class="figure-caption">Render (105°)</p></div>
+                <div class="video-item"><video playsinline autoplay loop muted><source src="assets/videos/aurorus_195.mp4" type="video/mp4"></video><p class="figure-caption">Render (195°)</p></div>
+                <div class="video-item"><video playsinline autoplay loop muted><source src="assets/videos/aurorus_cpts_15.mp4" type="video/mp4"></video><p class="figure-caption">Parts (15°)</p></div>
+                <div class="video-item"><video playsinline autoplay loop muted><source src="assets/videos/aurorus_cpts_-75.mp4" type="video/mp4"></video><p class="figure-caption">Parts (-75°)</p></div>
+                <div class="video-item"><video playsinline autoplay loop muted><source src="assets/videos/aurorus_cpts_105.mp4" type="video/mp4"></video><p class="figure-caption">Parts (105°)</p></div>
+                <div class="video-item"><video playsinline autoplay loop muted><source src="assets/videos/aurorus_cpts_195.mp4" type="video/mp4"></video><p class="figure-caption">Parts (195°)</p></div>
+            </div>
+
+            <div class="subject-title">Blooming Rose</div>
+            <div class="video-grid-4">
+                <div class="video-item"><video playsinline autoplay loop muted><source src="assets/videos/blooming_rose_15.mp4" type="video/mp4"></video><p class="figure-caption">Render (15°)</p></div>
+                <div class="video-item"><video playsinline autoplay loop muted><source src="assets/videos/blooming_rose_-75.mp4" type="video/mp4"></video><p class="figure-caption">Render (-75°)</p></div>
+                <div class="video-item"><video playsinline autoplay loop muted><source src="assets/videos/blooming_rose_105.mp4" type="video/mp4"></video><p class="figure-caption">Render (105°)</p></div>
+                <div class="video-item"><video playsinline autoplay loop muted><source src="assets/videos/blooming_rose_195.mp4" type="video/mp4"></video><p class="figure-caption">Render (195°)</p></div>
+                
+                <div class="video-item"><video playsinline autoplay loop muted><source src="assets/videos/blooming_rose_cpts_15.mp4" type="video/mp4"></video><p class="figure-caption">Parts (15°)</p></div>
+                <div class="video-item"><video playsinline autoplay loop muted><source src="assets/videos/blooming_rose_cpts_-75.mp4" type="video/mp4"></video><p class="figure-caption">Parts (-75°)</p></div>
+                <div class="video-item"><video playsinline autoplay loop muted><source src="assets/videos/blooming_rose_cpts_105.mp4" type="video/mp4"></video><p class="figure-caption">Parts (105°)</p></div>
+                <div class="video-item"><video playsinline autoplay loop muted><source src="assets/videos/blooming_rose_cpts_195.mp4" type="video/mp4"></video><p class="figure-caption">Parts (195°)</p></div>
+            </div>
+
+            <div class="subject-title">Trump</div>
+            <div class="video-grid-4">
+                <div class="video-item"><video playsinline autoplay loop muted><source src="assets/videos/trump_15.mp4" type="video/mp4"></video><p class="figure-caption">Render (15°)</p></div>
+                <div class="video-item"><video playsinline autoplay loop muted><source src="assets/videos/trump_-75.mp4" type="video/mp4"></video><p class="figure-caption">Render (-75°)</p></div>
+                <div class="video-item"><video playsinline autoplay loop muted><source src="assets/videos/trump_105.mp4" type="video/mp4"></video><p class="figure-caption">Render (105°)</p></div>
+                <div class="video-item"><video playsinline autoplay loop muted><source src="assets/videos/trump_195.mp4" type="video/mp4"></video><p class="figure-caption">Render (195°)</p></div>
+                
+                <div class="video-item"><video playsinline autoplay loop muted><source src="assets/videos/trump_cpts_15.mp4" type="video/mp4"></video><p class="figure-caption">Parts (15°)</p></div>
+                <div class="video-item"><video playsinline autoplay loop muted><source src="assets/videos/trump_cpts_-75.mp4" type="video/mp4"></video><p class="figure-caption">Parts (-75°)</p></div>
+                <div class="video-item"><video playsinline autoplay loop muted><source src="assets/videos/trump_cpts_105.mp4" type="video/mp4"></video><p class="figure-caption">Parts (105°)</p></div>
+                <div class="video-item"><video playsinline autoplay loop muted><source src="assets/videos/trump_cpts_195.mp4" type="video/mp4"></video><p class="figure-caption">Parts (195°)</p></div>
+            </div>
+
+            <div class="subject-title">Walking White-Faced Egret</div>
+            <div class="video-grid-4">
+                <div class="video-item"><video playsinline autoplay loop muted><source src="assets/videos/walking_white_faced_egret_15.mp4" type="video/mp4"></video><p class="figure-caption">Render (15°)</p></div>
+                <div class="video-item"><video playsinline autoplay loop muted><source src="assets/videos/walking_white_faced_egret_-75.mp4" type="video/mp4"></video><p class="figure-caption">Render (-75°)</p></div>
+                <div class="video-item"><video playsinline autoplay loop muted><source src="assets/videos/walking_white_faced_egret_105.mp4" type="video/mp4"></video><p class="figure-caption">Render (105°)</p></div>
+                <div class="video-item"><video playsinline autoplay loop muted><source src="assets/videos/walking_white_faced_egret_195.mp4" type="video/mp4"></video><p class="figure-caption">Render (195°)</p></div>
+                
+                <div class="video-item"><video playsinline autoplay loop muted><source src="assets/videos/walking_white_faced_egret_cpts_15.mp4" type="video/mp4"></video><p class="figure-caption">Parts (15°)</p></div>
+                <div class="video-item"><video playsinline autoplay loop muted><source src="assets/videos/walking_white_faced_egret_cpts_-75.mp4" type="video/mp4"></video><p class="figure-caption">Parts (-75°)</p></div>
+                <div class="video-item"><video playsinline autoplay loop muted><source src="assets/videos/walking_white_faced_egret_cpts_105.mp4" type="video/mp4"></video><p class="figure-caption">Parts (105°)</p></div>
+                <div class="video-item"><video playsinline autoplay loop muted><source src="assets/videos/walking_white_faced_egret_cpts_195.mp4" type="video/mp4"></video><p class="figure-caption">Parts (195°)</p></div>
+            </div>
+
+            <h3 style="color: #2b5876; margin: 40px 0 15px;">Quantitative Comparison (ARTEMIS-DFA)</h3>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Method</th>
+                        <th>PSNR ↑</th>
+                        <th>SSIM ↑</th>
+                        <th>LPIPS ↓</th>
+                        <th>FVD ↓</th>
+                        <th>FID-VID ↓</th>
+                        <th>CLIP ↑</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>Consistent4D</td>
+                        <td>24.73</td>
+                        <td>0.918</td>
+                        <td>0.157</td>
+                        <td>1025.67</td>
+                        <td>37.42</td>
+                        <td>0.895</td>
+                    </tr>
+                    <tr>
+                        <td>SC4D</td>
+                        <td>27.38</td>
+                        <td>0.924</td>
+                        <td>0.145</td>
+                        <td>1052.19</td>
+                        <td>38.84</td>
+                        <td>0.898</td>
+                    </tr>
+                    <tr>
+                        <td>DreamMesh4D</td>
+                        <td>29.12</td>
+                        <td>0.922</td>
+                        <td>0.138</td>
+                        <td>812.53</td>
+                        <td>22.18</td>
+                        <td>0.916</td>
+                    </tr>
+                    <tr style="background: #f0f4f8; font-weight: 600;">
+                        <td><strong>MotionStruct4D (Ours)</strong></td>
+                        <td><strong>30.68</strong></td>
+                        <td><strong>0.925</strong></td>
+                        <td><strong>0.134</strong></td>
+                        <td><strong>769.39</strong></td>
+                        <td><strong>19.67</strong></td>
+                        <td><strong>0.919</strong></td>
+                    </tr>
+                </tbody>
+            </table>
+        </section>
+
+        <section id="dataset">
+            <h2>Evaluation Benchmark</h2>
+            <p>
+                Existing video-to-4D datasets often suffer from limited object displacement and insufficient motion diversity. To address these limitations, we curated a challenging benchmark dataset restructured from ARTEMIS-DFA.
+            </p>
+            <div class="stats">
+                <div class="stat-box">
+                    <div class="stat-number">9</div>
+                    <div class="stat-label">Animal Species</div>
+                </div>
+                <div class="stat-box">
+                    <div class="stat-number">25</div>
+                    <div class="stat-label">Motion Sequences</div>
+                </div>
+                <div class="stat-box">
+                    <div class="stat-number">512px</div>
+                    <div class="stat-label">Evaluation Resolution</div>
+                </div>
+            </div>
+        </section>
+
+        <section>
+            <h2>Citation</h2>
+            <p>If you find our work useful, please consider citing:</p>
+            <div class="bibtex">
+<pre>@article{zhong2025motionstruct4d,
+  title={MotionStruct4D: Discovering Motion Structure of Gaussian Splatting for Video-to-4D Generation},
+  author={Zhong, Jia-Xing and Lu, Kai and Ye, Jiaojiao and Trigoni, Niki and Markham, Andrew},
+  journal={Under review}
+}</pre>
+            </div>
+        </section>
+    </div>
+
+    <footer>
+        <div class="container">
+            <p>&copy; 2025 Jia-Xing Zhong et al. All rights reserved.</p>
+        </div>
+    </footer>
+</body>
+</html>
